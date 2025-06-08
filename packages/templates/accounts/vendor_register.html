@@ -1,0 +1,30 @@
+{% extends 'packages/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="text-center">Vendor Registration</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary btn-block">Register</button>
+                        </div>
+                    </form>
+                    <hr>
+                    <div class="text-center">
+                        <p>Already have an account? <a href="{% url 'packages:login' %}">Login</a></p>
+                        <p>Are you a customer? <a href="{% url 'packages:register' %}">Register as Customer</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

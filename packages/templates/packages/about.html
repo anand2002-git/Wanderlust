@@ -1,0 +1,271 @@
+{% extends 'packages/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="about-container">
+    <header class="about-header">
+        <div class="overlay">
+            <h1>About {{ company_name }}</h1>
+            <h2>{{ tagline }}</h2>
+        </div>
+    </header>
+
+    <section class="about-content">
+        <div class="container">
+            <div class="about-intro">
+                <p class="lead">{{ description }}</p>
+            </div>
+
+            <div class="mission-section">
+                <div class="mission-icon">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <div class="mission-text">
+                    <h3>Our Mission</h3>
+                    <p>{{ mission }}</p>
+                </div>
+            </div>
+
+            <div class="history-section">
+                <h3>Since {{ founded }}</h3>
+                <p>We've been helping travelers discover the world's hidden gems.</p>
+                <div class="milestones">
+                    <div class="milestone">
+                        <span class="number">10,000+</span>
+                        <span class="label">Happy Travelers</span>
+                    </div>
+                    <div class="milestone">
+                        <span class="number">50+</span>
+                        <span class="label">Destinations</span>
+                    </div>
+                    <div class="milestone">
+                        <span class="number">100%</span>
+                        <span class="label">Satisfaction</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="team-section">
+        <div class="container">
+            <h2>Meet Our Team</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="member-photo" style="background-image: url('{% static 'images/team1.jpg' %}')"></div>
+                    <h4>Alex Johnson</h4>
+                    <p>Founder & CEO</p>
+                </div>
+                <div class="team-member">
+                    <div class="member-photo" style="background-image: url('{% static 'images/team2.jpg' %}')"></div>
+                    <h4>Sarah Williams</h4>
+                    <p>Travel Expert</p>
+                </div>
+                <div class="team-member">
+                    <div class="member-photo" style="background-image: url('{% static 'images/team3.jpg' %}')"></div>
+                    <h4>Michael Chen</h4>
+                    <p>Operations Manager</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+    /* Base Styles */
+    .about-container {
+        font-family: 'Open Sans', sans-serif;
+        color: #333;
+        line-height: 1.6;
+    }
+
+    /* Header Section */
+    .about-header {
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                    url('{% static "images/about-bg.jpg" %}');
+        background-size: cover;
+        background-position: center;
+        height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        margin-bottom: 50px;
+    }
+
+    .about-header h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .about-header h2 {
+        font-size: 2rem;
+        font-weight: 300;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Content Sections */
+    .about-content {
+        padding: 0 20px;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .about-intro .lead {
+        font-size: 1.25rem;
+        margin-bottom: 40px;
+        text-align: center;
+        color: #444;
+    }
+
+    /* Mission Section */
+    .mission-section {
+        display: flex;
+        align-items: center;
+        margin: 60px 0;
+        background: #f9f9f9;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .mission-icon {
+        font-size: 3rem;
+        color: #3498db;
+        margin-right: 30px;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .mission-text h3 {
+        color: #2c3e50;
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+
+    /* History Section */
+    .history-section {
+        text-align: center;
+        margin: 80px 0;
+    }
+
+    .history-section h3 {
+        font-size: 2rem;
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+
+    .milestones {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 40px;
+        flex-wrap: wrap;
+    }
+
+    .milestone {
+        padding: 20px;
+        min-width: 200px;
+    }
+
+    .milestone .number {
+        display: block;
+        font-size: 3rem;
+        font-weight: 700;
+        color: #3498db;
+        margin-bottom: 10px;
+    }
+
+    .milestone .label {
+        font-size: 1.1rem;
+        color: #7f8c8d;
+    }
+
+    /* Team Section */
+    .team-section {
+        background: #2c3e50;
+        color: white;
+        padding: 80px 0;
+        text-align: center;
+    }
+
+    .team-section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 50px;
+    }
+
+    .team-grid {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 30px;
+    }
+
+    .team-member {
+        background: white;
+        color: #333;
+        border-radius: 8px;
+        overflow: hidden;
+        width: 280px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+    }
+
+    .team-member:hover {
+        transform: translateY(-10px);
+    }
+
+    .member-photo {
+        height: 250px;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .team-member h4 {
+        margin: 20px 0 5px;
+        font-size: 1.5rem;
+    }
+
+    .team-member p {
+        color: #7f8c8d;
+        padding-bottom: 20px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .about-header h1 {
+            font-size: 2.5rem;
+        }
+        
+        .about-header h2 {
+            font-size: 1.5rem;
+        }
+        
+        .mission-section {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .mission-icon {
+            margin-right: 0;
+            margin-bottom: 20px;
+        }
+        
+        .milestones {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .milestone {
+            margin-bottom: 20px;
+        }
+    }
+</style>
+
+{% endblock %}

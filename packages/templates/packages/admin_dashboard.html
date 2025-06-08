@@ -1,0 +1,125 @@
+{% extends 'packages/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Admin Dashboard</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title">Packages Pending Approval</h5>
+                    <h2 class="text-primary">{{ packages_for_approval.count }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Vendors</h5>
+                    <h2 class="text-primary">{{ vendors.count }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <h5 class="card-title">Recent Bookings</h5>
+                    <h2 class="text-primary">{{ recent_bookings.count }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Packages Needing Approval</h5>
+                </div>
+                <div class="card-body">
+                    {% if packages_for_approval %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Package</th>
+                                    <th>Vendor</th>
+                                    <th>Price</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for package in packages_for_approval %}
+                                <tr>
+                                    <td>{{ package.title }}</td>
+                                    <td>{{ package.vendor.username }}</td>
+                                    <td>${{ package.price }}</td>
+                                    <td>
+                                        <a href="{% url 'packages:package_detail' package.id %}" class="btn btn-sm btn-outline-primary me-1">Review</a>
+                                        <form method="POST" action="{% url 'admin:approve_package' package.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success">
+                        No packages pending approval.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Recent Bookings</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_bookings %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>User</th>
+                                    <th>Package</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in recent_bookings %}
+                                <tr>
+                                    <td>#{{ booking.id }}</td>
+                                    <td>{{ booking.user.username }}</td>
+                                    <td>{{ booking.package.title }}</td>
+                                    <td>${{ booking.total_price }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if booking.status == 'CO' %}bg-success
+                                            {% elif booking.status == 'CA' %}bg-danger
+                                            {% else %}bg-warning{% endif %}">
+                                            {{ booking.get_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        No recent bookings found.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div

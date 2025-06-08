@@ -1,0 +1,73 @@
+{% extends 'packages/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Complete Your Booking</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5>Booking Summary</h5>
+                        <p><strong>Package:</strong> {{ package.title }}</p>
+                        <p><strong>Travel Date:</strong> {{ booking.travel_date }}</p>
+                        <p><strong>Persons:</strong> {{ booking.persons }}</p>
+                        <p><strong>Total Amount:</strong> ₹{{ booking.total_price }}</p>
+                    </div>
+
+                    <form id="payment-form" method="POST" action="/payment/success/">
+                        {% csrf_token %}
+                        <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+                        <input type="hidden" name="razorpay_order_id" value="{{ razorpay_order_id }}">
+                        <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+                        
+                        <!-- Only Razorpay Payment Button -->
+                        <button type="button" id="rzp-button" class="btn btn-primary btn-lg btn-block">
+                            Pay ₹{{ booking.total_price }} Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": "{{ amount }}",  // Amount in paise (e.g., ₹100 = 10000)
+        "currency": "INR",
+        "name": "WANDERLUST",
+        "description": "Booking for {{ package.title }}",
+        "image": "{% static 'images/logo.png' %}",
+        "order_id": "{{ razorpay_order_id }}",
+        "handler": function (response) {
+            // On successful payment
+            document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+            document.getElementById('razorpay_signature').value = response.razorpay_signature;
+            
+            // Submit the form to your success endpoint
+            document.getElementById('payment-form').submit();
+        },
+        "prefill": {
+            "name": "{{ user.name }}",
+            "email": "{{ user.email }}",
+            "contact": "{{ user.contact }}"
+        },
+        "theme": {
+            "color": "#3399cc"
+        }
+    };
+    
+    var rzp = new Razorpay(options);
+    
+    document.getElementById('rzp-button').onclick = function(e) {
+        rzp.open();
+        e.preventDefault();
+    }
+</script>
+{% endblock %}

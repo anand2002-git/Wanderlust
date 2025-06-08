@@ -1,0 +1,261 @@
+{% extends 'packages/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-center text-white py-5" 
+         style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                url('{% static 'images/mainbg.jpg' %}');
+                background-size: cover;
+                background-position: center;">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="typewriter mb-4">
+                    <span>Escape to the Wonders of <span id="dynamic-word">Paris</span>.</span>
+                </div>
+                <p class="lead mb-5">Travel Across India with Our Expertly Crafted Tour Packages</p>
+                <form class="row g-3 justify-content-center" action="{% url 'packages:package_list' %}" method="get">
+                    <div class="col-md-6">
+                        <input type="text" name="q" class="form-control form-control-lg" placeholder="Search destinations or packages...">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary btn-lg w-100">Search</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- All Available Packages -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Available Tour Packages</h2>
+        <div class="row g-4">
+            {% for package in available_packages %}
+            <div class="col-md-4">
+                <div class="card h-100 package-card">
+                    <img src="{{ package.featured_image.url }}" class="card-img-top" alt="{{ package.title }}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-primary">{{ package.get_category_display }}</span>
+                            <span class="text-muted">{{ package.duration_days }} days</span>
+                        </div>
+                        <h5 class="card-title">{{ package.title }}</h5>
+                        <p class="card-text text-muted">{{ package.destination }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 text-primary">₹{{ package.price }}</h5>
+                            <a href="{% url 'packages:package_detail' package.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No packages available at the moment. Please check back later.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- View All Packages Button -->
+        <div class="text-center mt-4">
+            <a href="{% url 'packages:package_list' %}" class="btn btn-primary">View All Packages</a>
+        </div>
+        
+        {% if available_packages.has_other_pages %}
+        <div class="mt-4">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if available_packages.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ available_packages.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for i in available_packages.paginator.page_range %}
+                    <li class="page-item {% if available_packages.number == i %}active{% endif %}">
+                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                    </li>
+                    {% endfor %}
+                    
+                    {% if available_packages.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ available_packages.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Popular Packages -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">Most Booked Packages</h2>
+        <div class="row g-4">
+            {% for package in popular_packages %}
+            <div class="col-md-4">
+                <div class="card h-100 package-card">
+                    <img src="{{ package.featured_image.url }}" class="card-img-top" alt="{{ package.title }}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-primary">{{ package.get_category_display }}</span>
+                            <span class="text-muted">{{ package.duration_days }} days</span>
+                        </div>
+                        <h5 class="card-title">{{ package.title }}</h5>
+                        <p class="card-text text-muted">{{ package.destination }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 text-primary">₹{{ package.price }}</h5>
+                            <div class="text-muted small">
+                                <i class="fas fa-users"></i> {{ package.bookings.count }} bookings
+                            </div>
+                            <a href="{% url 'packages:package_detail' package.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No popular packages yet. Be the first to book!
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Why Choose Wanderlust</h2>
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="p-4">
+                    <i class="fas fa-globe fa-3x text-primary mb-3"></i>
+                    <h4>Worldwide Tours</h4>
+                    <p class="text-muted">Explore destinations across all continents with our diverse range of packages.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4">
+                    <i class="fas fa-hand-holding-usd fa-3x text-primary mb-3"></i>
+                    <h4>Best Price Guarantee</h4>
+                    <p class="text-muted">We offer competitive prices with no hidden charges for a transparent experience.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4">
+                    <i class="fas fa-headset fa-3x text-primary mb-3"></i>
+                    <h4>24/7 Support</h4>
+                    <p class="text-muted">Our dedicated support team is available round the clock to assist you.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Enhanced Typewriter Effect for Hero Section
+    const dynamicWord = document.getElementById('dynamic-word');
+    if (dynamicWord) {
+        const words = ["Kerala", "Tamilnadu", "Delhi", "Mumbai", "Goa", "Rajasthan"];
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typingSpeed = 150;
+        const pauseEnd = 2000;
+        const pauseStart = 500;
+
+        function typeWriter() {
+            const currentWord = words[wordIndex];
+
+            if (isDeleting) {
+                dynamicWord.textContent = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+                typingSpeed = 80;
+            } else {
+                dynamicWord.textContent = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+                typingSpeed = 150;
+            }
+
+            if (!isDeleting && charIndex === currentWord.length) {
+                isDeleting = true;
+                typingSpeed = pauseEnd;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                typingSpeed = pauseStart;
+            }
+
+            setTimeout(typeWriter, typingSpeed);
+        }
+
+        typeWriter();  // Start typing effect
+    }
+
+    // Form auto date fill
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+    dateInputs.forEach(input => {
+        if (!input.value) {
+            const today = new Date().toISOString().split('T')[0];
+            input.value = today;
+        }
+    });
+
+    // Form submit spinner
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function () {
+            const buttons = form.querySelectorAll('button[type="submit"]');
+            buttons.forEach(button => {
+                button.disabled = true;
+                button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+            });
+        });
+    });
+
+    // Image preview
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    fileInputs.forEach(input => {
+        input.addEventListener('change', function () {
+            const previewContainer = document.createElement('div');
+            previewContainer.className = 'image-preview mt-2';
+
+            if (this.files && this.files.length > 0) {
+                for (let i = 0; i < this.files.length; i++) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'img-thumbnail me-2 mb-2';
+                        img.style.maxHeight = '100px';
+                        previewContainer.appendChild(img);
+                    }
+                    reader.readAsDataURL(this.files[i]);
+                }
+            }
+
+            const existingPreview = this.nextElementSibling;
+            if (existingPreview && existingPreview.classList.contains('image-preview')) {
+                existingPreview.remove();
+            }
+
+            this.after(previewContainer);
+        });
+    });
+});
+</script>
+
+{% endblock %}

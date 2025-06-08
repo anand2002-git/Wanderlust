@@ -1,0 +1,252 @@
+body {
+    font-family: "Inter", sans-serif;
+    line-height: 1.5;
+    background: #ffffff;
+    overflow-x: hidden;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+body:before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 99;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transition: .3s all ease;    
+}
+
+body.offcanvas-menu:before {
+    opacity: 1;
+    visibility: visible;
+}
+
+.bg-primary {
+    background-color: #1A374D !important;
+}
+
+.text-black {
+    color: #000000 !important;
+}
+
+a {
+    color: #1A374D;
+    transition: .3s all ease;
+}
+
+a:hover {
+    color: #1A374D;
+    text-decoration: none;
+}
+
+.text-primary {
+    color: #1A374D !important;
+}
+
+h1, h2, h3, h4 {
+    font-family: "Source Serif Pro", serif;
+}
+
+.btn {
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-size: 14px;
+}
+
+.btn.btn-primary {
+    background: #1A374D;
+    border-color: #1A374D;
+}
+
+.btn.btn-primary:hover {
+    background: #1f425c;
+    border-color: #1f425c;
+}
+
+.form-control, .custom-select {
+    border: 2px solid #e9ecef;
+    font-size: 16px;
+    height: 45px;
+}
+
+.form-control:focus, .custom-select:focus {
+    border-color: #1A374D;
+    box-shadow: none;
+}
+
+.navbar {
+    padding: 20px 0;
+}
+
+.navbar-brand {
+    font-size: 24px;
+    color: #ffffff;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.nav-link:hover {
+    color: #ffffff;
+}
+
+.alert {
+    margin-bottom: 20px;
+}
+
+footer {
+    background: #1A374D;
+    color: #ffffff;
+    padding: 20px 0;
+}
+
+footer a {
+    color: #ffffff;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+.social-links a {
+    color: rgba(255, 255, 255, 0.5);
+    margin-right: 10px;
+}
+
+.social-links a:hover {
+    color: #ffffff;
+}
+
+.site-footer .widget h3 {
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+.site-footer .widget .social li a {
+    background: #1A374D;
+    border-radius: 50%;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    color: #ffffff;
+}
+
+.site-footer .widget .social li a:hover {
+    background-color: #204560;
+}
+
+.title-with-bg {
+    font-size: 50px;
+    color: #ffffff;
+    margin-bottom: 30px;
+}
+
+.title-with-bg span {
+    color: white;
+    background-color: #1A374D;
+    box-shadow: 0.5em 0 0 #1A374D, -0.5em 0 0 #1A374D;
+}
+
+.video-play-button {
+    position: absolute;
+    z-index: 10;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    transition: .3s all ease;
+}
+
+.video-play-button:hover {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.testimonial {
+    max-width: 500px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.testimonial .name {
+    font-size: 18px;
+    color: #000000;
+}
+
+.testimonial .img-wrap img {
+    margin: 0 auto;
+    width: 70px;
+    border-radius: 50%;
+}
+
+.owl-single .owl-nav {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    transform: translateY(-50%);
+}
+
+.owl-single .owl-nav .owl-prev, .owl-single .owl-nav .owl-next {
+    position: absolute;
+    top: 0;
+}
+
+.owl-single .owl-nav .owl-prev {
+    left: -30px;
+}
+
+.owl-single .owl-nav .owl-next {
+    right: -30px;
+}
+
+.owl-single .owl-nav .owl-prev span, .owl-single .owl-nav .owl-next span {
+    display: block;
+    background: #ffffff;
+    padding: 15px;
+}
+
+.testimonial-section {
+    background: #f8f9fa;
+    padding: 5rem 0;
+}
+
+/* Typewriter Effect */
+/* Typewriter container */
+.typewriter {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: white;
+    margin: 0 auto;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+/* Dynamic word styling */
+#dynamic-word {
+    display: inline-block;
+    position: relative;
+    color: hsl(48, 100%, 50%); /* Optional: different color for the dynamic word */
+}
+
+/* Cursor animation */
+#dynamic-word::after {
+    content: "|";
+    position: absolute;
+    right: -8px;
+    animation: blink-caret 0.75s step-end infinite;
+}
+
+@keyframes blink-caret {
+    from, to { opacity: 0; }
+    50% { opacity: 1; }
+}

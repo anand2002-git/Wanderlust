@@ -1,0 +1,273 @@
+<!-- packages/templates/accounts/profile.html -->
+{% extends 'packages/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Profile Section -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">My Profile</h5>
+                    <button class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2 text-center">
+                            <img src="{{ user.profile_picture_url }}" 
+                                 class="img-thumbnail rounded-circle mb-3" 
+                                 alt="Profile Picture" 
+                                 style="width: 120px; height: 120px; object-fit: cover;">
+                        </div>
+                        <div class="col-md-10">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h4>{{ user.get_full_name|default:user.username }}</h4>
+                                    <p class="text-muted mb-1"><i class="fas fa-envelope"></i> {{ user.email }}</p>
+                                    {% if user.phone %}
+                                    <p class="text-muted mb-1"><i class="fas fa-phone"></i> {{ user.phone }}</p>
+                                    {% endif %}
+                                    {% if user.company_name %}
+                                    <p class="text-muted mb-1"><i class="fas fa-building"></i> {{ user.company_name }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    {% if user.bio %}
+                                    <p class="mb-2"><strong>About:</strong> {{ user.bio }}</p>
+                                    {% endif %}
+                                    {% if user.company_location %}
+                                    <p class="mb-1"><i class="fas fa-map-marker-alt"></i> {{ user.company_location }}</p>
+                                    {% endif %}
+                                    {% if user.website %}
+                                    <p class="mb-1"><i class="fas fa-globe"></i> <a href="{{ user.website }}" target="_blank">{{ user.website }}</a></p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if user.is_vendor %}
+                            <div class="row mt-3">
+                                <div class="col-md-12">
+                                    <div class="vendor-details">
+                                        {% if user.years_of_experience %}
+                                        <span class="badge bg-info me-2">
+                                            <i class="fas fa-clock"></i> {{ user.years_of_experience }} years experience
+                                        </span>
+                                        {% endif %}
+                                        {% if user.specializations %}
+                                        <span class="badge bg-secondary me-2">
+                                            <i class="fas fa-star"></i> {{ user.specializations }}
+                                        </span>
+                                        {% endif %}
+                                        {% if user.languages_spoken %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-language"></i> {{ user.languages_spoken }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bookings Section -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">My Bookings</h5>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    {% if bookings %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Package</th>
+                                    <th>Date</th>
+                                    <th>Persons</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in bookings %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'packages:package_detail' booking.package.id %}">
+                                            {{ booking.package.title }}
+                                        </a>
+                                    </td>
+                                    <td>{{ booking.travel_date|date:"M d, Y" }}</td>
+                                    <td>{{ booking.persons }}</td>
+                                    <td>${{ booking.total_price }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if booking.status == 'CO' %}bg-success
+                                            {% elif booking.status == 'CA' %}bg-danger
+                                            {% else %}bg-warning{% endif %}">
+                                            {{ booking.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-outline-primary" 
+                                           data-bs-toggle="modal" data-bs-target="#bookingModal{{ booking.id }}">
+                                            Details
+                                        </a>
+                                        {% if booking.status == 'PE' %}
+                                        <form method="post" action="{% url 'packages:cancel_booking' booking.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                        </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        You haven't made any bookings yet. <a href="{% url 'packages:package_list' %}">Explore our packages</a> to get started.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'packages:profile_update' %}" enctype="multipart/form-data">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    
+                    <!-- Display form errors -->
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Error:</strong> Please correct the errors below.
+                            <ul>
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ field|title }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="id_first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" 
+                                   id="id_first_name" name="first_name" 
+                                   value="{% if form.first_name.value %}{{ form.first_name.value }}{% else %}{{ user.first_name }}{% endif %}">
+                            {% if form.first_name.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.first_name.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" 
+                                   id="id_last_name" name="last_name" 
+                                   value="{% if form.last_name.value %}{{ form.last_name.value }}{% else %}{{ user.last_name }}{% endif %}">
+                            {% if form.last_name.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.last_name.errors|join:", " }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Continue with other fields in the same pattern -->
+                    <!-- ... rest of your form fields ... -->
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Details Modals -->
+{% for booking in bookings %}
+<div class="modal fade" id="bookingModal{{ booking.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Booking #{{ booking.id }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Package:</strong>
+                        <p>{{ booking.package.title }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Destination:</strong>
+                        <p>{{ booking.package.destination }}</p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Travel Date:</strong>
+                        <p>{{ booking.travel_date|date:"M d, Y" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Booking Date:</strong>
+                        <p>{{ booking.booking_date|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Persons:</strong>
+                        <p>{{ booking.persons }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Total Price:</strong>
+                        <p>${{ booking.total_price }}</p>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <strong>Special Requests:</strong>
+                    <p>{{ booking.special_requests|default:"None" }}</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

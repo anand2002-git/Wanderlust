@@ -1,0 +1,210 @@
+{% extends 'packages/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div id="packageCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
+                <div class="carousel-inner rounded">
+                    <div class="carousel-item active">
+                        <img src="{{ package.featured_image.url }}" class="d-block w-100" alt="{{ package.title }}" style="height: 400px; object-fit: cover;">
+                    </div>
+                    {% for image in package.images.all %}
+                    <div class="carousel-item">
+                        <img src="{{ image.image.url }}" class="d-block w-100" alt="{{ image.caption|default:package.title }}" style="height: 400px; object-fit: cover;">
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#packageCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#packageCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="card-title">
+                        {{ package.title }}
+                        {% if request.user == package.vendor %}
+                            <a href="{% url 'packages:edit_package' package.id %}" class="btn btn-sm btn-outline-secondary ms-2">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a href="{% url 'packages:delete_package' package.id %}" class="btn btn-sm btn-outline-danger ms-2">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        {% endif %}
+                    </h2>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                        <span class="me-3">{{ package.destination }}</span>
+                        <i class="fas fa-clock text-primary me-2"></i>
+                        <span class="me-3">{{ package.duration_days }} days</span>
+                        <i class="fas fa-tag text-primary me-2"></i>
+                        <span class="badge bg-primary">{{ package.get_category_display }}</span>
+                    </div>
+                    <h4 class="text-primary mb-3">₹{{ package.price }} <small class="text-muted">per person</small></h4>
+                    
+                    <h4 class="mt-4">About This Tour</h4>
+                    <p class="card-text">{{ package.description }}</p>
+                    
+                    <div class="mt-4">
+                        <h4>What's Included</h4>
+                        <ul class="list-group list-group-flush">
+                            {% for item in package.inclusions.splitlines %}
+                            <li class="list-group-item border-0 ps-0"><i class="fas fa-check text-success me-2"></i> {{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vendor Details Section -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="flex-shrink-0">
+                            <img src="{{ package.vendor.profile_picture_url }}" alt="{{ package.vendor.get_full_name }}" 
+                                 class="rounded-circle" width="80" height="80">
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h4 class="mb-1">{{ package.vendor.get_full_name }}</h4>
+                            <div class="d-flex align-items-center text-muted mb-2">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                <span>{{ package.vendor.company_location|default:"Not specified" }}</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="me-3">
+                                    <i class="fas fa-suitcase text-primary"></i>
+                                    <span class="ms-1">{{ package.vendor.tourpackage_set.count }} packages</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5>About the Vendor</h5>
+                        <p>{{ package.vendor.bio|default:"This vendor hasn't provided a bio yet." }}</p>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Experience</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    {{ package.vendor.years_of_experience|default:"5" }} years in tourism
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-success me-2"></i>
+                                    Specializes in {{ package.vendor.specializations|default:"Adventure Tours" }}
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Contact</h5>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-envelope me-2"></i>
+                                    {{ package.vendor.email }}
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-phone me-2"></i>
+                                    {{ package.vendor.phone|default:"Not provided" }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if package.can_be_booked or request.user == package.vendor or request.user.is_superuser %}
+        <div class="col-md-4">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        {% if request.user == package.vendor %}
+                            Book This Package (Vendor Booking)
+                        {% else %}
+                            Book This Package
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="POST" action="{% url 'packages:package_detail' package.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_travel_date" class="form-label">Travel Date</label>
+                            <input type="date" name="travel_date" class="form-control" id="id_travel_date" required
+                                   min="{{ today|date:'Y-m-d' }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_persons" class="form-label">Number of Persons</label>
+                            <input type="number" name="persons" class="form-control" id="id_persons" 
+                                   min="1" max="{{ package.max_persons }}" required>
+                            <small class="text-muted">Max: {{ package.max_persons }} persons</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_special_requests" class="form-label">Special Requests</label>
+                            <textarea name="special_requests" class="form-control" id="id_special_requests" rows="3"></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-calendar-check me-2"></i> 
+                                {% if request.user == package.vendor %}
+                                    Book as Vendor
+                                {% else %}
+                                    Proceed to Payment
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                    <div class="mt-3 text-center">
+                        <small class="text-muted">By booking, you agree to our <a href="#">Terms & Conditions</a></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if similar_packages %}
+    <div class="row mt-5">
+        <h3>You Might Also Like</h3>
+        {% for package in similar_packages %}
+        <div class="col-md-3">
+            <div class="card h-100 package-card">
+                <img src="{{ package.featured_image.url }}" class="card-img-top" alt="{{ package.title }}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-primary">{{ package.get_category_display }}</span>
+                        <span class="text-muted">{{ package.duration_days }} days</span>
+                    </div>
+                    <h5 class="card-title">{{ package.title }}</h5>
+                    <p class="card-text text-muted">{{ package.destination }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-primary">₹{{ package.price }}</h5>
+                        <a href="{% url 'packages:package_detail' package.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
