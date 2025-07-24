@@ -10,69 +10,181 @@
                     <h3>Add New Package</h3>
                 </div>
                 <div class="card-body">
-                    <form method="post" enctype="multipart/form-data">
+                    <!-- Display form errors -->
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>Error!</strong> Please correct the following:
+                        <ul>
+                            {% for field, errors in form.errors.items %}
+                                {% for error in errors %}
+                                    <li>{{ field|title }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data" novalidate>
                         {% csrf_token %}
                         
-                        <!-- Main Package Fields -->
+                        <!-- Title -->
                         <div class="mb-3">
-                            <label class="form-label">Title</label>
-                            {{ form.title }}
+                            <label for="{{ form.title.id_for_label }}" class="form-label">Title*</label>
+                            <input type="text" class="form-control {% if form.title.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.title.id_for_label }}" name="{{ form.title.name }}" 
+                                   value="{{ form.title.value|default:'' }}" required>
+                            {% if form.title.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.title.errors.0 }}
+                                </div>
+                            {% endif %}
                         </div>
                         
+                        <!-- Destination and Category -->
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">Destination</label>
-                                {{ form.destination }}
+                                <label for="{{ form.destination.id_for_label }}" class="form-label">Destination*</label>
+                                <input type="text" class="form-control {% if form.destination.errors %}is-invalid{% endif %}" 
+                                       id="{{ form.destination.id_for_label }}" name="{{ form.destination.name }}" 
+                                       value="{{ form.destination.value|default:'' }}" required>
+                                {% if form.destination.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.destination.errors.0 }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Category</label>
-                                {{ form.category }}
+                                <label for="{{ form.category.id_for_label }}" class="form-label">Category*</label>
+                                <select class="form-select {% if form.category.errors %}is-invalid{% endif %}" 
+                                        id="{{ form.category.id_for_label }}" name="{{ form.category.name }}" required>
+                                    {% for value, label in form.category.field.choices %}
+                                        <option value="{{ value }}" {% if form.category.value == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                {% if form.category.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.category.errors.0 }}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         
+                        <!-- Description -->
                         <div class="mb-3">
-                            <label class="form-label">Description</label>
-                            {{ form.description }}
+                            <label for="{{ form.description.id_for_label }}" class="form-label">Description*</label>
+                            <textarea class="form-control {% if form.description.errors %}is-invalid{% endif %}" 
+                                      id="{{ form.description.id_for_label }}" name="{{ form.description.name }}" 
+                                      rows="4" required>{{ form.description.value|default:'' }}</textarea>
+                            {% if form.description.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.description.errors.0 }}
+                                </div>
+                            {% endif %}
                         </div>
                         
+                        <!-- Price, Duration, Max Persons -->
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label class="form-label">Price ($)</label>
-                                {{ form.price }}
+                                <label for="{{ form.price.id_for_label }}" class="form-label">Price ($)*</label>
+                                <input type="number" step="0.01" class="form-control {% if form.price.errors %}is-invalid{% endif %}" 
+                                       id="{{ form.price.id_for_label }}" name="{{ form.price.name }}" 
+                                       value="{{ form.price.value|default:'' }}" min="0" required>
+                                {% if form.price.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.price.errors.0 }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Duration (days)</label>
-                                {{ form.duration_days }}
+                                <label for="{{ form.duration_days.id_for_label }}" class="form-label">Duration (days)*</label>
+                                <input type="number" class="form-control {% if form.duration_days.errors %}is-invalid{% endif %}" 
+                                       id="{{ form.duration_days.id_for_label }}" name="{{ form.duration_days.name }}" 
+                                       value="{{ form.duration_days.value|default:'' }}" min="1" required>
+                                {% if form.duration_days.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.duration_days.errors.0 }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Max Persons</label>
-                                {{ form.max_persons }}
+                                <label for="{{ form.max_persons.id_for_label }}" class="form-label">Max Persons*</label>
+                                <input type="number" class="form-control {% if form.max_persons.errors %}is-invalid{% endif %}" 
+                                       id="{{ form.max_persons.id_for_label }}" name="{{ form.max_persons.name }}" 
+                                       value="{{ form.max_persons.value|default:1 }}" min="1" required>
+                                {% if form.max_persons.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.max_persons.errors.0 }}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         
+                        <!-- Featured Image -->
                         <div class="mb-3">
-                            <label class="form-label">Featured Image</label>
-                            {{ form.featured_image }}
+                            <label for="{{ form.featured_image.id_for_label }}" class="form-label">Featured Image*</label>
+                            <input type="file" class="form-control {% if form.featured_image.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.featured_image.id_for_label }}" name="{{ form.featured_image.name }}" 
+                                   accept="image/*" required>
+                            {% if form.featured_image.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.featured_image.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">Main image for your package (JPEG, PNG)</small>
                         </div>
                         
+                        <!-- Additional Images -->
                         <div class="mb-3">
-                            <label class="form-label">Additional Images</label>
-                            <input type="file" name="additional_images" multiple class="form-control">
-                            <small class="text-muted">Hold Ctrl to select multiple images</small>
+                            <label for="{{ form.additional_images.id_for_label }}" class="form-label">Additional Images</label>
+                            <input type="file" class="form-control {% if form.additional_images.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.additional_images.id_for_label }}" name="{{ form.additional_images.name }}" 
+                                   multiple accept="image/*">
+                            {% if form.additional_images.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.additional_images.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">Optional extra images (Hold Ctrl to select multiple)</small>
                         </div>
                         
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Expiry Date</label>
-                                {{ form.expiry_date }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Inclusions</label>
-                                {{ form.inclusions }}
-                            </div>
+                        <!-- Expiry Date -->
+                        <div class="mb-3">
+                            <label for="{{ form.expiry_date.id_for_label }}" class="form-label">Expiry Date*</label>
+                            <input type="date" class="form-control {% if form.expiry_date.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.expiry_date.id_for_label }}" name="{{ form.expiry_date.name }}" 
+                                   value="{{ form.expiry_date.value|default:'' }}" min="{{ today }}" required>
+                            {% if form.expiry_date.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.expiry_date.errors.0 }}
+                                </div>
+                            {% endif %}
                         </div>
                         
-                        <button type="submit" class="btn btn-primary">Save Package</button>
+                        <!-- Inclusions -->
+                        <div class="mb-3">
+                            <label for="{{ form.inclusions.id_for_label }}" class="form-label">Inclusions</label>
+                            <textarea class="form-control {% if form.inclusions.errors %}is-invalid{% endif %}" 
+                                      id="{{ form.inclusions.id_for_label }}" name="{{ form.inclusions.name }}" 
+                                      rows="3">{{ form.inclusions.value|default:'' }}</textarea>
+                            {% if form.inclusions.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.inclusions.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <small class="text-muted">List what's included in the package (separate with commas or new lines)</small>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Save Package
+                            </button>
+                            <a href="{% if request.user.is_superuser %}{% url 'packages:admin_dashboard' %}{% else %}{% url 'packages:vendor_dashboard' %}{% endif %}" 
+                               class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Cancel
+                            </a>
+                        </div>
                     </form>
                 </div>
             </div>

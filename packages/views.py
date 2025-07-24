@@ -301,6 +301,7 @@ def payment_success(request):
 @login_required
 def add_package(request):
     if not request.user.is_vendor and not request.user.is_superuser:
+        messages.error(request, "Only vendors can add packages.")
         return redirect('packages:home')
     
     if request.method == 'POST':
@@ -308,24 +309,27 @@ def add_package(request):
         if form.is_valid():
             package = form.save(commit=False)
             package.vendor = request.user
-            if not request.user.is_superuser:
-                package.is_approved = False  # vendors need approval
+            package.is_approved = request.user.is_superuser
             package.save()
             
-            for image in request.FILES.getlist('additional_images'):
-                PackageImage.objects.create(package=package, image=image)
+            # Handle additional images
+            if 'additional_images' in request.FILES:
+                for image in request.FILES.getlist('additional_images'):
+                    PackageImage.objects.create(package=package, image=image)
             
-            if request.user.is_superuser:
-                messages.success(request, 'Package added successfully!')
-            else:
-                messages.success(request, 'Package submitted for approval!')
+            messages.success(request, 'Package created successfully!')
             return redirect('packages:package_detail', pk=package.id)
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     else:
         form = PackageForm(user=request.user)
     
-    return render(request, 'packages/add_package.html', {'form': form})
-
-
+    return render(request, 'packages/add_package.html', {
+        'form': form,
+        'today': timezone.now().strftime('%Y-%m-%d')
+    })
 @login_required
 def edit_package(request, pk):
     package = get_object_or_404(TourPackage, pk=pk, vendor=request.user)

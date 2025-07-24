@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm
 from .models import *
-from .widgets import MultipleFileInput
+from .widgets import MultipleFileInput,MultipleFileField
 from django.utils import timezone
 
 class UserRegisterForm(UserCreationForm):
@@ -41,54 +41,52 @@ class VendorRegisterForm(UserCreationForm):
         return user
 
 class PackageForm(forms.ModelForm):
-    additional_images = forms.FileField(
+    additional_images = MultipleFileField(
         required=False,
-        widget=MultipleFileInput(attrs={'class': 'form-control'}),
-        label='Additional Images'
+        widget=MultipleFileInput(attrs={
+            'class': 'form-control',
+            'accept': 'image/*'
+        }),
+        label='Additional Images',
+        help_text='Select multiple images (JPEG, PNG, etc.)'
     )
     
+    # ... rest of your form class ...
     class Meta:
         model = TourPackage
         fields = ['title', 'destination', 'description', 'price', 'duration_days', 
-                 'category', 'featured_image', 'expiry_date', 'max_persons', 'inclusions']
+                 'category', 'featured_image', 'expiry_date', 'max_persons', 
+                 'inclusions', 'is_approved']
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'destination': forms.TextInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 4,
-                'placeholder': 'Detailed description...'
-            }),
-            'price': forms.NumberInput(attrs={'class': 'form-control'}),
-            'duration_days': forms.NumberInput(attrs={'class': 'form-control'}),
-            'category': forms.Select(attrs={'class': 'form-control'}),
-            'featured_image': forms.FileInput(attrs={'class': 'form-control'}),
             'expiry_date': forms.DateInput(attrs={
                 'type': 'date',
-                'class': 'form-control'
-            }),
-            'max_persons': forms.NumberInput(attrs={'class': 'form-control'}),
-            'inclusions': forms.Textarea(attrs={
                 'class': 'form-control',
-                'rows': 3,
-                'placeholder': 'List what\'s included...'
+                'min': timezone.now().strftime('%Y-%m-%d')
             }),
         }
     
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        self.fields['expiry_date'].widget.attrs['min'] = timezone.now().strftime('%Y-%m-%d')
-
+        if self.user and not self.user.is_superuser:
+            self.fields['is_approved'].disabled = True
+            self.fields['is_approved'].initial = False
+    
     def save(self, commit=True):
         package = super().save(commit=False)
         if self.user:
             package.vendor = self.user
             package.is_approved = self.user.is_superuser
+        
         if commit:
             package.save()
+            
+            # Handle additional images
+            if 'additional_images' in self.files:
+                for image in self.files.getlist('additional_images'):
+                    PackageImage.objects.create(package=package, image=image)
+        
         return package
-
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking

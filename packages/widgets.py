@@ -1,19 +1,29 @@
 from django import forms
-from django.forms import ClearableFileInput
-
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
+    
+    def __init__(self, attrs=None):
+        attrs = attrs or {}
+        attrs['multiple'] = True
+        super().__init__(attrs)
+
+    def value_from_datadict(self, data, files, name):
+        if hasattr(files, 'getlist'):
+            return files.getlist(name)
+        return None
 
 class MultipleFileField(forms.FileField):
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault("widget", MultipleFileInput())
-        super().__init__(*args, **kwargs)
-
+    widget = MultipleFileInput
+    
     def clean(self, data, initial=None):
-        single_file_clean = super().clean
-        if isinstance(data, (list, tuple)):
-            result = [single_file_clean(d, initial) for d in data]
-        else:
-            result = single_file_clean(data, initial)
+        if data is None:
+            return super().clean(data, initial)
+            
+        if not isinstance(data, (list, tuple)):
+            data = [data]
+            
+        result = []
+        for item in data:
+            result.append(super().clean(item, initial))
         return result
